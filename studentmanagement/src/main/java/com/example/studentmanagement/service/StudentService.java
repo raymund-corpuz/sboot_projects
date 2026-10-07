@@ -6,8 +6,10 @@ import com.example.studentmanagement.entity.Student;
 import com.example.studentmanagement.exception.DuplicateEmailException;
 import com.example.studentmanagement.exception.StudentNotFoundException;
 import com.example.studentmanagement.repository.StudentRepository;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.List;
 
@@ -31,7 +33,7 @@ public class StudentService {
     }
 
     @Transactional
-    public StudentResponse createStudent(StudentRequest request){
+    public StudentResponse createStudent( StudentRequest request){
         if(studentRepository.existsByEmail(request.email())){
             throw new DuplicateEmailException(request.email());
         }
