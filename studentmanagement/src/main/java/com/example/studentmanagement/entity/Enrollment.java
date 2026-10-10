@@ -29,10 +29,10 @@ public class Enrollment {
         //
     }
 
-    public Enrollment(Student student, Course course, LocalDateTime enrolledAt) {
+    public Enrollment(Student student, Course course) {
         this.student = student;
         this.course = course;
-        this.enrolledAt = enrolledAt;
+        this.enrolledAt = LocalDateTime.now();
     }
 
     public Long getId() {
