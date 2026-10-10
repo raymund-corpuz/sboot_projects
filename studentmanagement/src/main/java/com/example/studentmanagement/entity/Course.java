@@ -1,17 +1,18 @@
 package com.example.studentmanagement.entity;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
-@Table(name ="courses")
+@Table(name = "courses")
 public class Course {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy =  GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true , length = 20, nullable = false)
+    @Column(length = 20, nullable = false, unique = true)
     private String code;
 
     @Column(length = 100, nullable = false)
@@ -24,10 +25,10 @@ public class Course {
         //
     }
 
-    public Course(String code, int credits, String title) {
+    public Course(String code, String title, int credits) {
         this.code = code;
-        this.credits = credits;
         this.title = title;
+        this.credits = credits;
     }
 
     public Long getId() {

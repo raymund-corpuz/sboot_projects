@@ -16,13 +16,14 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     boolean existsByCourseId(Long courseId);
 
-    Optional<Enrollment> findStudentIdAndCourseId(Long studentId, Long courseId);
+    Optional<Enrollment> findByStudentIdAndCourseId(Long studentId, Long courseId);
 
     void deleteByStudentId(Long studentId);
 
-    @Query("select e.student from Enrollment e where e.course.id = :courseId")
-    List<Student> findStudentsByCourseId(@Param("courseId") Long courseId);
 
-    @Query("select e.course from Enrollment e where e.studen.id = :studentId")
-    List<Course> findCoursesByStudentId(@Param("studentId") Long studentId);
+    @Query("select e.student from Enrollment e where e.course.id = :courseId")
+    List<Student> findStudentByCourseId(@Param("courseId") Long courseId);
+
+    @Query("select e.course from Enrollment e where e.student.id = :studentId")
+    List<Course> findCourseByStudentId(@Param("studentId") Long studentId);
 }
