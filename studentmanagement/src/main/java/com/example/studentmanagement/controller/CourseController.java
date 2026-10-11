@@ -5,14 +5,13 @@ import com.example.studentmanagement.dto.CourseResponse;
 import com.example.studentmanagement.service.CourseService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/courses")

@@ -40,7 +40,7 @@ public class CourseService {
     public CourseResponse createCourse(CourseRequest request){
         String code = request.code().trim().toUpperCase(Locale.ROOT);
 
-        if(courseRepository.existByCode(request.code())){
+        if(courseRepository.existsByCode(request.code())){
             throw new DuplicateCourseCodeException(request.code());
         }
 

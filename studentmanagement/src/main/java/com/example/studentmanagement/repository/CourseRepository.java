@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
-    boolean existByCode(String code);
+    boolean existsByCode(String code);
 }

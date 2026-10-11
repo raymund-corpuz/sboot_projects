@@ -23,9 +23,10 @@ public class GlobalExceptionHandler {
       return build(HttpStatus.NOT_FOUND, ex.getMessage());
   }
 
-  @ExceptionHandler({StudentNotFoundException.class,
-          CourseNotFoundException.class,
-          EnrollmentNotFoundException.class})
+  @ExceptionHandler({DuplicateEmailException.class,
+  DuplicateCourseCodeException.class,
+  AlreadyEnrolledException.class,
+  CourseHasEnrollmentException.class})
   public ResponseEntity<ErrorResponse> handleConflict(RuntimeException ex){
       return build(HttpStatus.CONFLICT, ex.getMessage());
   }

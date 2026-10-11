@@ -9,6 +9,7 @@ import com.example.studentmanagement.entity.Enrollment;
 import com.example.studentmanagement.entity.Student;
 import com.example.studentmanagement.exception.AlreadyEnrolledException;
 import com.example.studentmanagement.exception.CourseNotFoundException;
+import com.example.studentmanagement.exception.EnrollmentNotFoundException;
 import com.example.studentmanagement.exception.StudentNotFoundException;
 import com.example.studentmanagement.repository.CourseRepository;
 import com.example.studentmanagement.repository.EnrollmentRepository;
@@ -50,7 +51,7 @@ public class EnrollmentService {
 
   @Transactional
     public void unenroll(Long studentId, Long courseId){
-        Enrollment enrollment = enrollmentRepository.findByStudentIdAndCourseId(studentId,courseId).orElseThrow(()-> new AlreadyEnrolledException(studentId, courseId));
+        Enrollment enrollment = enrollmentRepository.findByStudentIdAndCourseId(studentId,courseId).orElseThrow(()-> new EnrollmentNotFoundException(studentId, courseId));
 
         enrollmentRepository.delete(enrollment);
   }
@@ -66,6 +67,6 @@ public class EnrollmentService {
         if(!studentRepository.existsById(studentId)){
             throw  new StudentNotFoundException(studentId);
         }
-        return enrollmentRepository.findCourseByStudentId(studentId).stream().map(CourseResponse::from).toList();
+        return enrollmentRepository.findCoursesByStudentId(studentId).stream().map(CourseResponse::from).toList();
   }
 }
