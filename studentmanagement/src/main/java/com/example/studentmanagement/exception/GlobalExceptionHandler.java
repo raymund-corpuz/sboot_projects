@@ -16,13 +16,17 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-  @ExceptionHandler(StudentNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNotFound(StudentNotFoundException ex){
+  @ExceptionHandler({StudentNotFoundException.class,
+          CourseNotFoundException.class,
+          EnrollmentNotFoundException.class})
+    public ResponseEntity<ErrorResponse> handleNotFound(RuntimeException ex){
       return build(HttpStatus.NOT_FOUND, ex.getMessage());
   }
 
-  @ExceptionHandler(DuplicateEmailException.class)
-  public ResponseEntity<ErrorResponse> handleDuplicateEmail(DuplicateEmailException ex){
+  @ExceptionHandler({StudentNotFoundException.class,
+          CourseNotFoundException.class,
+          EnrollmentNotFoundException.class})
+  public ResponseEntity<ErrorResponse> handleConflict(RuntimeException ex){
       return build(HttpStatus.CONFLICT, ex.getMessage());
   }
 

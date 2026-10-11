@@ -9,7 +9,6 @@ import com.example.studentmanagement.entity.Enrollment;
 import com.example.studentmanagement.entity.Student;
 import com.example.studentmanagement.exception.AlreadyEnrolledException;
 import com.example.studentmanagement.exception.CourseNotFoundException;
-import com.example.studentmanagement.exception.EnrollmentNotFoundException;
 import com.example.studentmanagement.exception.StudentNotFoundException;
 import com.example.studentmanagement.repository.CourseRepository;
 import com.example.studentmanagement.repository.EnrollmentRepository;
@@ -35,7 +34,7 @@ public class EnrollmentService {
 
   @Transactional
     public EnrollmentResponse enroll(Long studentId, Long courseId){
-      Student student = studentRepository.findById(String.valueOf(studentId)).orElseThrow(() -> new StudentNotFoundException(studentId));
+      Student student = studentRepository.findById(studentId).orElseThrow(() -> new StudentNotFoundException(studentId));
       Course course = courseRepository.findById(courseId).orElseThrow(()-> new CourseNotFoundException(courseId));
 
       if(enrollmentRepository.existsByStudentIdAndCourseId(studentId, courseId)){
@@ -64,7 +63,7 @@ public class EnrollmentService {
   }
 
   public List<CourseResponse> getCoursesForStudent(Long studentId){
-        if(!studentRepository.existsById(String.valueOf(studentId))){
+        if(!studentRepository.existsById(studentId)){
             throw  new StudentNotFoundException(studentId);
         }
         return enrollmentRepository.findCourseByStudentId(studentId).stream().map(CourseResponse::from).toList();

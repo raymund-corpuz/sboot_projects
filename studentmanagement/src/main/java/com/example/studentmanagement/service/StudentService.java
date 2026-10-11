@@ -5,12 +5,14 @@ import com.example.studentmanagement.dto.StudentResponse;
 import com.example.studentmanagement.entity.Student;
 import com.example.studentmanagement.exception.DuplicateEmailException;
 import com.example.studentmanagement.exception.StudentNotFoundException;
+import com.example.studentmanagement.repository.EnrollmentRepository;
 import com.example.studentmanagement.repository.StudentRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import javax.swing.text.html.parser.Entity;
 import java.util.List;
 
 @Service
@@ -18,9 +20,11 @@ import java.util.List;
 public class StudentService {
 
     private final StudentRepository studentRepository;
+    private final EnrollmentRepository enrollmentRepository;
 
-    public StudentService(StudentRepository studentRepository){
+    public StudentService(StudentRepository studentRepository, EnrollmentRepository enrollmentRepository){
         this.studentRepository = studentRepository;
+        this.enrollmentRepository = enrollmentRepository;
     }
 
     public List<StudentResponse> getAllStudents(){
@@ -65,11 +69,12 @@ public class StudentService {
     @Transactional
     public void deleteStudent(Long id){
         Student student = findStudentOrThrow(id);
+        enrollmentRepository.deleteByStudentId(id);
 
         studentRepository.delete(student);
     }
 
     public Student findStudentOrThrow(Long id){
-        return studentRepository.findById(String.valueOf(id)).orElseThrow(()-> new StudentNotFoundException(id));
+        return studentRepository.findById(id).orElseThrow(()-> new StudentNotFoundException(id));
     }
 }

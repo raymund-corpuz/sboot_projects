@@ -61,6 +61,6 @@ public class CourseService {
     }
 
     private Course getIdOrThrow(Long id){
-        courseRepository.findById(id).orElseThrow(()-> new CourseNotFoundException(id));
+       return courseRepository.findById(id).orElseThrow(()-> new CourseNotFoundException(id));
     }
 }
