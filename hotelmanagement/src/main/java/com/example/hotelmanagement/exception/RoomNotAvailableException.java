@@ -1,7 +1,8 @@
 package com.example.hotelmanagement.exception;
 
 public class RoomNotAvailableException extends RuntimeException {
-    public RoomNotAvailableException(String message) {
-        super(message);
+    public RoomNotAvailableException(Integer roomNumber) {
+
+        super("Room number not found :" + roomNumber);
     }
 }

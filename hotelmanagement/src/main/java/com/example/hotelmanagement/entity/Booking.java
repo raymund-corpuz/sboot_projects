@@ -1,5 +1,6 @@
 package com.example.hotelmanagement.entity;
 
+import com.example.hotelmanagement.entity.enums.BookingStatus;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -15,11 +16,11 @@ public class Booking {
     private Long bookingId;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(nullable = false)
+    @JoinColumn(name="guest_id",nullable = false)
     private Guest guest;
 
     @ManyToOne(fetch =  FetchType.LAZY, optional = false)
-    @JoinColumn(nullable = false)
+    @JoinColumn(name = "room_id", nullable = false)
     private Room room;
 
     @Column(nullable = false)
@@ -27,6 +28,9 @@ public class Booking {
 
     @Column(nullable = false)
     private LocalDate checkOut;
+
+    @Enumerated(EnumType.STRING)
+    private BookingStatus status;
 
 
     protected Booking(){
@@ -38,6 +42,7 @@ public class Booking {
         this.room = room;
         this.checkIn = checkIn;
         this.checkOut = checkOut;
+        this.status = BookingStatus.CONFIRMED;
     }
 
     public Long getBookingId() {
@@ -58,5 +63,9 @@ public class Booking {
 
     public LocalDate getCheckOut() {
         return checkOut;
+    }
+
+    public BookingStatus getStatus() {
+        return status;
     }
 }

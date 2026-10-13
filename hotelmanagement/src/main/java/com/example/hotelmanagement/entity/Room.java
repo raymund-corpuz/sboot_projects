@@ -1,8 +1,7 @@
 package com.example.hotelmanagement.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.example.hotelmanagement.entity.enums.RoomType;
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 
@@ -11,11 +10,15 @@ import java.math.BigDecimal;
 public class Room {
 
     //roomNumber, roomType, price, available
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @Column(length = 4, nullable = false)
     private int roomNumber;
 
-    @Column(length = 50, nullable = false)
-    private String roomType;
+    @Enumerated(EnumType.STRING)
+    private RoomType roomType;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
@@ -27,18 +30,22 @@ public class Room {
         //JPA
     }
 
-    public Room(int roomNumber, String roomType, BigDecimal price, boolean available) {
+    public Room(int roomNumber, RoomType roomType, BigDecimal price, boolean available) {
         this.roomNumber = roomNumber;
         this.roomType = roomType;
         this.price = price;
         this.available = available;
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public int getRoomNumber() {
         return roomNumber;
     }
 
-    public String getRoomType() {
+    public RoomType getRoomType() {
         return roomType;
     }
 
