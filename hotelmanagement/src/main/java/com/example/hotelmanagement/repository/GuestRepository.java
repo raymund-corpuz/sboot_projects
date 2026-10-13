@@ -10,5 +10,5 @@ public interface GuestRepository extends JpaRepository<Guest,Long> {
     boolean existsByEmail(String email);
 
     @Override
-    boolean existsById(Long guestId);
+    boolean existsById(Long id);
 }

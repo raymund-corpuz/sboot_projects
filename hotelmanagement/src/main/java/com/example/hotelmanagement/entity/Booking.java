@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "bookings")
+@Table(name = "bookings", uniqueConstraints = @UniqueConstraint(name = "uk_booking_guest_room", columnNames = {"guest_id", "room_number"}))
 public class Booking {
 
     //bookingId, Guest, Room ,check-in, check-out, status
@@ -20,7 +20,7 @@ public class Booking {
     private Guest guest;
 
     @ManyToOne(fetch =  FetchType.LAZY, optional = false)
-    @JoinColumn(name = "room_id", nullable = false)
+    @JoinColumn(name = "room_number", nullable = false)
     private Room room;
 
     @Column(nullable = false)

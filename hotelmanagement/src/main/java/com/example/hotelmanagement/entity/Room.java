@@ -56,4 +56,20 @@ public class Room {
     public boolean isAvailable() {
         return available;
     }
+
+    public void setRoomNumber(int roomNumber) {
+        this.roomNumber = roomNumber;
+    }
+
+    public void setRoomType(RoomType roomType) {
+        this.roomType = roomType;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
+    }
 }
