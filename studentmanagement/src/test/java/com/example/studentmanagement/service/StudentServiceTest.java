@@ -17,10 +17,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class StudentServiceTest {
@@ -34,15 +38,15 @@ class StudentServiceTest {
     @InjectMocks
     private StudentService studentService;
 
-    private StudentRequest validRequest(){
-        return new StudentRequest("Ana", "Santos", "ana@mail.com", LocalDate.of(2003, 5,24));
-
+    private StudentRequest validRequest() {
+        return new StudentRequest("Ana", "Santos", "ana@mail.com", LocalDate.of(2003, 5, 14));
     }
 
     @Test
-    void createStudent_newEmail_savesAndReturnsResponse(){
+    void createStudent_newEmail_savesAndReturnsResponse() {
         when(studentRepository.existsByEmail("ana@mail.com")).thenReturn(false);
-        when(studentRepository.save(any(Student.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(studentRepository.save(any(Student.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
 
         StudentResponse response = studentService.createStudent(validRequest());
 
@@ -52,20 +56,32 @@ class StudentServiceTest {
     }
 
     @Test
-    void getStudentById_missing_throwsNotFound(){
+    void createStudent_duplicateEmail_throwsAndDoesNotSave() {
+        when(studentRepository.existsByEmail("ana@mail.com")).thenReturn(true);
+
+        assertThatThrownBy(() -> studentService.createStudent(validRequest()))
+                .isInstanceOf(DuplicateEmailException.class)
+                .hasMessageContaining("ana@mail.com");
+
+        verify(studentRepository, never()).save(any(Student.class));
+    }
+
+    @Test
+    void getStudentById_missing_throwsNotFound() {
         when(studentRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(()-> studentService.getStudentById(99L))
+        assertThatThrownBy(() -> studentService.getStudentById(99L))
                 .isInstanceOf(StudentNotFoundException.class)
                 .hasMessage("Student not found with id: 99");
     }
 
     @Test
-    void updateStudent_sameEmail_skipsDuplicateCheck(){
-        Student existing = new Student("Ana", "Santos", "ana@mail.com", LocalDate.of(2003, 5,14));
+    void updateStudent_sameEmail_skipsDuplicateCheck() {
+        Student existing = new Student("Ana", "Santos", "ana@mail.com", LocalDate.of(2003, 5, 14));
         when(studentRepository.findById(1L)).thenReturn(Optional.of(existing));
 
-        StudentRequest request = new StudentRequest("Ana", "Reyes", "ana@mail.com", LocalDate.of(2003,5,14));
+        StudentRequest request =
+                new StudentRequest("Ana", "Reyes", "ana@mail.com", LocalDate.of(2003, 5, 14));
         StudentResponse response = studentService.updateStudent(1L, request);
 
         assertThat(response.lastName()).isEqualTo("Reyes");
@@ -73,19 +89,21 @@ class StudentServiceTest {
     }
 
     @Test
-    void updateStudent_emailTakenByAnotherStudent_throws(){
-        Student existing = new Student("Ana", "Santos", "ana@mail.com",LocalDate.of(2003, 5,14));
+    void updateStudent_emailTakenByAnotherStudent_throws() {
+        Student existing = new Student("Ana", "Santos", "ana@mail.com", LocalDate.of(2003, 5, 14));
         when(studentRepository.findById(1L)).thenReturn(Optional.of(existing));
         when(studentRepository.existsByEmail("ben@mail.com")).thenReturn(true);
 
-        StudentRequest request = new StudentRequest("Ana", "Santos", "ben@mail.com",LocalDate.of(2003,5,14));
+        StudentRequest request =
+                new StudentRequest("Ana", "Santos", "ben@mail.com", LocalDate.of(2003, 5, 14));
 
-        assertThatThrownBy(()-> studentService.updateStudent(1L, request)).isInstanceOf(DuplicateEmailException.class);
+        assertThatThrownBy(() -> studentService.updateStudent(1L, request))
+                .isInstanceOf(DuplicateEmailException.class);
     }
 
     @Test
-    void deleteStudent_removesEnrollmentsBeforeStudent(){
-        Student existing = new Student("Ana", "Santos", "ana@mail.com", LocalDate.of(2003,5,14));
+    void deleteStudent_removesEnrollmentsBeforeStudent() {
+        Student existing = new Student("Ana", "Santos", "ana@mail.com", LocalDate.of(2003, 5, 14));
         when(studentRepository.findById(1L)).thenReturn(Optional.of(existing));
 
         studentService.deleteStudent(1L);
