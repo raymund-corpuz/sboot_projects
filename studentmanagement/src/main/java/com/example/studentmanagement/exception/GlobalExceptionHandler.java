@@ -8,6 +8,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.LinkedHashMap;
@@ -25,10 +26,16 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler({DuplicateEmailException.class,
   DuplicateCourseCodeException.class,
+          DuplicateUsernameException.class,
   AlreadyEnrolledException.class,
   CourseHasEnrollmentException.class})
   public ResponseEntity<ErrorResponse> handleConflict(RuntimeException ex){
       return build(HttpStatus.CONFLICT, ex.getMessage());
+  }
+
+  @ExceptionHandler(AuthenticationException.class)
+  public ResponseEntity<ErrorResponse> handleAuthentication(AuthenticationException ex){
+      return build(HttpStatus.UNAUTHORIZED, "Invalid username or password");
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
