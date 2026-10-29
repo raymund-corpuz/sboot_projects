@@ -2,6 +2,7 @@ package com.example.studentmanagement.service;
 
 import com.example.studentmanagement.dto.LoginRequest;
 import com.example.studentmanagement.dto.RegisterRequest;
+import com.example.studentmanagement.dto.TokenResponse;
 import com.example.studentmanagement.dto.UserResponse;
 import com.example.studentmanagement.entity.AppUser;
 import com.example.studentmanagement.entity.Role;
@@ -22,11 +23,13 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager,JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.authenticationManager = authenticationManager;
+        this.jwtService = jwtService;
     }
 
     public UserResponse register(RegisterRequest request){
@@ -42,16 +45,17 @@ public class AuthService {
         return UserResponse.from(userRepository.save(user));
     }
 
-    public UserResponse login(LoginRequest request){
+    public TokenResponse login(LoginRequest request){
         String username = normalize(request.username());
 
         authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, request.password())
-        );
+                new UsernamePasswordAuthenticationToken(username, request.password()));
 
         AppUser user = userRepository.findByUsername(username).orElseThrow(()-> new BadCredentialsException("Invalid credentials"));
 
-        return UserResponse.from(user);
+        JwtService.AccessToken token = jwtService.createAccessToken(user);
+        return  new TokenResponse(token.value(), "Bearer", token.expiresInSeconds(), UserResponse.from(user));
+
     }
 
     private String normalize(String username){
