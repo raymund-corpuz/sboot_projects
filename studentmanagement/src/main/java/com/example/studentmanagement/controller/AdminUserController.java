@@ -22,4 +22,9 @@ public class AdminUserController {
     public UserResponse createUser(@Valid @RequestBody CreateUserRequest request){
         return  userService.createUser(request);
     }
+
+    @PutMapping("/{userId}/student/{studentId}")
+    public UserResponse linkStudent(@PathVariable Long userId, @PathVariable Long studentId){
+        return userService.linkStudent(userId, studentId);
+    }
 }

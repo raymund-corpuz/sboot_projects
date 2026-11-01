@@ -7,6 +7,7 @@ import com.example.studentmanagement.service.StudentService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -29,6 +30,7 @@ public class StudentController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize(("@studentAccess.canView(authentication, #id)"))
     public StudentResponse getStudentById(@PathVariable Long id){
         return studentService.getStudentById(id);
     }
@@ -56,4 +58,6 @@ public class StudentController {
     public void deleteStudent(@PathVariable Long id){
         studentService.deleteStudent(id);
     }
+
+
 }

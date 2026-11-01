@@ -23,7 +23,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
-        response.setHeader(HttpHeaders.WWW_AUTHENTICATE, "Bearer");
+        response.setHeader("WWW-Authenticate", "Bearer");
         writer.write(response, HttpStatus.UNAUTHORIZED,
                 "Authentication is required: send a valid Bearer token");
     }

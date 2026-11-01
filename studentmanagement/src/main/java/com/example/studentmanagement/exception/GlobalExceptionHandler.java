@@ -20,7 +20,8 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler({StudentNotFoundException.class,
           CourseNotFoundException.class,
-          EnrollmentNotFoundException.class})
+          EnrollmentNotFoundException.class,
+  UserNotFoundException.class})
     public ResponseEntity<ErrorResponse> handleNotFound(RuntimeException ex){
       return build(HttpStatus.NOT_FOUND, ex.getMessage());
   }
@@ -29,9 +30,15 @@ public class GlobalExceptionHandler {
   DuplicateCourseCodeException.class,
           DuplicateUsernameException.class,
   AlreadyEnrolledException.class,
-  CourseHasEnrollmentException.class})
+  CourseHasEnrollmentException.class,
+  StudentAlreadyLinkedException.class})
   public ResponseEntity<ErrorResponse> handleConflict(RuntimeException ex){
       return build(HttpStatus.CONFLICT, ex.getMessage());
+  }
+
+  @ExceptionHandler(InvalidUserOperationException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidUserOperation(InvalidUserOperationException ex){
+      return build(HttpStatus.BAD_REQUEST, ex.getMessage());
   }
 
   @ExceptionHandler(AccessDeniedException.class)

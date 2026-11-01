@@ -8,6 +8,7 @@ import com.example.studentmanagement.exception.StudentNotFoundException;
 import com.example.studentmanagement.repository.EnrollmentRepository;
 import com.example.studentmanagement.repository.StudentRepository;
 
+import com.example.studentmanagement.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,10 +22,12 @@ public class StudentService {
 
     private final StudentRepository studentRepository;
     private final EnrollmentRepository enrollmentRepository;
+    private final UserRepository userRepository;
 
-    public StudentService(StudentRepository studentRepository, EnrollmentRepository enrollmentRepository){
+    public StudentService(StudentRepository studentRepository, EnrollmentRepository enrollmentRepository, UserRepository userRepository){
         this.studentRepository = studentRepository;
         this.enrollmentRepository = enrollmentRepository;
+        this.userRepository = userRepository;
     }
 
     public List<StudentResponse> getAllStudents(){
@@ -71,6 +74,7 @@ public class StudentService {
         Student student = findStudentOrThrow(id);
         enrollmentRepository.deleteByStudentId(id);
 
+        userRepository.unlinkStudent(id);
         studentRepository.delete(student);
     }
 

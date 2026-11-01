@@ -6,6 +6,7 @@ import com.example.studentmanagement.dto.StudentResponse;
 import com.example.studentmanagement.service.EnrollmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,6 +42,7 @@ public class EnrollmentController {
     }
 
     @GetMapping("/students/{studentId}/courses")
+    @PreAuthorize("@studentAccess.canView(authentication, #studentId)")
     public List<CourseResponse> getCoursesForStudent(@PathVariable Long studentId){
         return enrollmentService.getCoursesForStudent(studentId);
     }

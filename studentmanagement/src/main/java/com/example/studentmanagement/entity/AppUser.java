@@ -27,6 +27,9 @@ public class AppUser {
         @Column(nullable = false)
         private LocalDateTime createdAt;
 
+        @Column(name = "student_id", unique = true)
+        private  Long studentId;
+
         protected AppUser(){
             //JPA
         }
@@ -61,5 +64,17 @@ public class AppUser {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public Long getStudentId(){
+            return studentId;
+    }
+
+    public void linkStudent(Long studentId){
+            this.studentId = studentId;
+    }
+
+    public void setEnabled(boolean enabled){
+            this.enabled = enabled;
     }
 }
