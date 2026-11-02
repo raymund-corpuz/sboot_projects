@@ -20,6 +20,10 @@ public class StudentAccessPolicy {
 
     public boolean canView(Authentication authentication, Long studentId){
 
+        if(hasRole(authentication, "ADMIN") || hasRole(authentication, "TEACHER")){
+            return true;
+        }
+
         if(hasRole(authentication, "STUDENT")){
             return userRepository.findByUsername(authentication.getName())
                     .map(AppUser::getStudentId)

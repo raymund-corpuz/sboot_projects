@@ -58,7 +58,7 @@ public class GlobalExceptionHandler {
       ex.getBindingResult().getFieldErrors()
               .forEach(error ->fieldErrors.putIfAbsent(error.getField(),error.getDefaultMessage()));
 
-      ErrorResponse body = ErrorResponse.ofValidation(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_GATEWAY.getReasonPhrase(), "Validation failed", fieldErrors);
+      ErrorResponse body = ErrorResponse.ofValidation(HttpStatus.BAD_REQUEST.value(), HttpStatus.BAD_REQUEST.getReasonPhrase(), "Validation failed", fieldErrors);
       return ResponseEntity.badRequest().body(body);
   }
 
