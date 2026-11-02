@@ -52,6 +52,11 @@ public class GlobalExceptionHandler {
       return build(HttpStatus.UNAUTHORIZED, "Invalid username or password");
   }
 
+  @ExceptionHandler(InvalidRefreshTokenException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidRefreshToken(InvalidRefreshTokenException ex){
+      return build(HttpStatus.UNAUTHORIZED, ex.getMessage());
+  }
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex){
       Map<String, String> fieldErrors = new LinkedHashMap<>();
