@@ -66,6 +66,18 @@ public class RefreshTokenService {
         return new Rotation(current.getUserId(), next);
     }
 
+    //Logout: idempotent and silent (an unknown token is simply ignored)
+    @Transactional
+    public void revoke(String rawToken){
+        refreshTokenRepository.findByTokenHashForUpdate(hash(rawToken))
+                .ifPresent(token -> refreshTokenRepository.revokeFamily(token.getFamilyId(),nowUtc()));
+    }
+
+    @Transactional
+    public void revokeAllForUser(Long userId){
+        refreshTokenRepository.revokeAllForUser(userId, nowUtc());
+    }
+
     private String create(Long userId, String familyId){
         byte[] bytes = new byte[32];
         secureRandom.nextBytes(bytes);

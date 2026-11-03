@@ -76,6 +76,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/students/*").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/students/*").hasRole("ADMIN")
 
+                        //Open two new URLs (they authenticate with the refresh token)
+                                .requestMatchers("/api/auth/register", "/api/auth/login"
+                                ,"/api/auth/refresh", "/api/auth/logout").permitAll()
+
                         // deny by default: anything not listed above
                         .anyRequest().denyAll()
                 )

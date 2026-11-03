@@ -1,10 +1,7 @@
 package com.example.studentmanagement.controller;
 
 
-import com.example.studentmanagement.dto.LoginRequest;
-import com.example.studentmanagement.dto.RegisterRequest;
-import com.example.studentmanagement.dto.TokenResponse;
-import com.example.studentmanagement.dto.UserResponse;
+import com.example.studentmanagement.dto.*;
 import com.example.studentmanagement.service.AuthService;
 import jakarta.validation.Valid;
 import org.springframework.http.CacheControl;
@@ -33,5 +30,19 @@ public class AuthController {
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noStore())
                 .body(authService.login(request));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponse> refresh(@Valid @RequestBody RefreshRequest request){
+
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.noStore())
+                .body(authService.refresh(request.refreshToken()));
+    }
+
+    @PostMapping("/logout")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(@Valid @RequestBody RefreshRequest request){
+        authService.logout(request.refreshToken());
     }
 }

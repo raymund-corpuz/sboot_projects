@@ -19,11 +19,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final StudentRepository studentRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RefreshTokenService refreshTokenService;
 
-    public UserService(UserRepository userRepository,StudentRepository studentRepository, PasswordEncoder passwordEncoder){
+    public UserService(UserRepository userRepository,
+                       StudentRepository studentRepository,
+                       PasswordEncoder passwordEncoder,
+                       RefreshTokenService refreshTokenService){
         this.userRepository = userRepository;
         this.studentRepository = studentRepository;
         this.passwordEncoder = passwordEncoder;
+        this.refreshTokenService = refreshTokenService;
     }
 
     //No  @Transactional : BCrypt is slow
@@ -59,5 +64,25 @@ public class UserService {
         user.linkStudent(studentId);
         return UserResponse.from(user);
     }
+
+    @Transactional
+    public UserResponse setEnabled(Long userId, boolean enabled, String actingUsername){
+
+        AppUser user = userRepository.findById(userId)
+                .orElseThrow(()-> new UserNotFoundException( userId));
+
+        if(!enabled && user.getUsername().equals(actingUsername)){
+            throw new InvalidUserOperationException("You cannot disable your own account");
+        }
+
+        user.setEnabled(enabled);
+        if(!enabled){
+            refreshTokenService.revokeAllForUser(userId); //ends their sessions
+        }
+
+        return UserResponse.from(user);
+    }
+
+
 
 }
