@@ -2,6 +2,7 @@ package com.example.studentmanagement.exception;
 
 import com.example.studentmanagement.dto.ErrorResponse;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -46,6 +47,18 @@ public class GlobalExceptionHandler {
       return build(HttpStatus.FORBIDDEN, "You do not have permission to perform this action");
   }
 
+  @ExceptionHandler(TooManyLoginAttemptsException.class)
+  public ResponseEntity<ErrorResponse> handleTooManyAttempts(TooManyLoginAttemptsException ex){
+      ErrorResponse body = ErrorResponse.of(
+              HttpStatus.TOO_MANY_REQUESTS.value(),
+              HttpStatus.TOO_MANY_REQUESTS.getReasonPhrase(),
+              ex.getMessage()
+      );
+
+      return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+              .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.getRetryAfterSeconds()))
+              .body(body);
+  }
 
   @ExceptionHandler(AuthenticationException.class)
   public ResponseEntity<ErrorResponse> handleAuthentication(AuthenticationException ex){

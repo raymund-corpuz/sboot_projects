@@ -3,11 +3,14 @@ package com.example.studentmanagement.controller;
 
 import com.example.studentmanagement.dto.*;
 import com.example.studentmanagement.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -26,10 +29,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request){
+    public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request,
+                                               HttpServletRequest httpServletRequest){
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noStore())
-                .body(authService.login(request));
+                .body(authService.login(request, httpServletRequest.getRemoteAddr()));
     }
 
     @PostMapping("/refresh")
