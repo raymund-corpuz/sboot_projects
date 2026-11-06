@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 
 @Configuration
 @EnableWebSecurity
@@ -35,28 +37,29 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
+                .cors(Customizer.withDefaults())          // uses the CorsConfigurationSource bean
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp ->
+                                csp.policyDirectives("default-src 'none'; frame-ancestors 'none'"))
+                        .referrerPolicy(referrer -> referrer.policy(ReferrerPolicy.NO_REFERRER)))
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint(authenticationEntryPoint)
                         .accessDeniedHandler(accessDeniedHandler))
                 .authorizeHttpRequests(auth -> auth
-                        // Spring's error dispatch; permitting it avoids masking real errors
                         .requestMatchers("/error").permitAll()
 
-                        // public
-                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/register", "/api/auth/login",
+                                "/api/auth/refresh", "/api/auth/logout").permitAll()
 
-                        // administration
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                        // courses
                         .requestMatchers(HttpMethod.GET, "/api/courses", "/api/courses/*")
                         .hasAnyRole("ADMIN", "TEACHER", "STUDENT")
                         .requestMatchers(HttpMethod.POST, "/api/courses").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/courses/*").hasRole("ADMIN")
 
-                        // enrollments
                         .requestMatchers(HttpMethod.GET, "/api/courses/*/students")
                         .hasAnyRole("ADMIN", "TEACHER")
                         .requestMatchers(HttpMethod.POST, "/api/courses/*/students/*")
@@ -64,23 +67,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/courses/*/students/*")
                         .hasAnyRole("ADMIN", "TEACHER")
 
-                        // students
-                        .requestMatchers(HttpMethod.GET,"/api/students").hasAnyRole("ADMIN", "TEACHER")
-                        .requestMatchers(HttpMethod.GET, "/api/students/*","/api/students/*/courses").hasAnyRole("ADMIN", "TEACHER", "STUDENT")
-
-
-//                        .requestMatchers(HttpMethod.GET, "/api/students", "/api/students/*",
-//                                "/api/students/*/courses")
-//                        .hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.GET, "/api/students")
+                        .hasAnyRole("ADMIN", "TEACHER")
+                        .requestMatchers(HttpMethod.GET, "/api/students/*", "/api/students/*/courses")
+                        .hasAnyRole("ADMIN", "TEACHER", "STUDENT")   // ownership: @PreAuthorize
                         .requestMatchers(HttpMethod.POST, "/api/students").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/students/*").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/students/*").hasRole("ADMIN")
 
-                        //Open two new URLs (they authenticate with the refresh token)
-                                .requestMatchers("/api/auth/register", "/api/auth/login"
-                                ,"/api/auth/refresh", "/api/auth/logout").permitAll()
-
-                        // deny by default: anything not listed above
                         .anyRequest().denyAll()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
